@@ -40,7 +40,7 @@ void WINgardium_leviosa() {
 ```
 The first two are called by main and the third function is our goal, because
 it executes `system("/bin/sh")` which gives us a shell to cat the flag with.
-(also the capitalised WIN in the name gives you a clue).
+(also the capitalized WIN in the name gives you a clue).
 
 ____
 ## Exploitation ideas
@@ -54,7 +54,7 @@ Full RELRO      No canary found   NX enabled    PIE enabled     No RPATH   No RU
 ... and we sure do.
 
 Then I looked at the functions :
-* `welcome` calls `gets` which is always a bad sign, but it did not seem to be exploitable at this time, because we don't know the adress of `WINgardium_leviosa`
+* `welcome` calls `gets` which is always a bad sign, but it did not seem to be exploitable at this time, because we don't know the address of `WINgardium_leviosa`
 * `welcome` also called `printf` with our input, which lets us leak (or even write to) values on the stack through a format string exploit.
 * `AAAAAAAA` also calls `gets` but compares the output of it and only returns if we enter the right input
 
@@ -65,7 +65,7 @@ Then I looked at the functions :
   we want to exploit this)
 
 ## Exploitation
-So the first exploitable thing is the format string. We dont have any address we can write to yet, so the
+So the first exploitable thing is the format string. We don't have any address we can write to yet, so the
 only thing we can do is leak. We somehow need to get the address of `WINgardium_leviosa`. A way how we
 can do this is by somehow leaking some address pointing to code (a return value or something like that)
 and then adding the needed offset to get to the `WINgardium_leviosa` function.
@@ -88,7 +88,7 @@ p|%p|%p|%p|%p|%p|%p|%p|%p|
 21|0x7fffffffde78|0x100000000|(nil)|0x7ffff7dc7023|0x71| enter your magic spell:
 
 ```
-The code section is `0x555555554000  -  0x555555555000`. So in our leak we are looking for adresses
+The code section is `0x555555554000  -  0x555555555000`. So in our leak we are looking for addresses
 matching that range. The first address we find matching the range is `0x555555554b21` (being the 39th
 leak)
 With gdb I looked what this address was and found out that this is probably the return address of the
@@ -158,7 +158,7 @@ p.sendline(b"Expelliarmus\0" + b"A" * cyclic_find(b"cnaa") + p64(win))
 
 p.interactive()
 ```
-This script works localy and you get a shell, but if you try to exploit the server with that you get a
+This script works locally and you get a shell, but if you try to exploit the server with that you get a
 EOF before the shell is spawned. This most probably means, that the remote process crashed. This can
 sometimes happen, when the stack is not properly aligned. To fix this we need to pop one (or more) values
 from the stack. And this can be done, by simply adding the address of a ret instruction in front of the

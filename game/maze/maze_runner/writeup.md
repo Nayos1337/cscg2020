@@ -50,7 +50,7 @@ I don't know why I used this function, but I did.
 
 ## Injection
 
-I knew in theory how you would implement such a hijack, but I leared it from [Guided Hacking](https://www.youtube.com/user/L4DL4D2EUROPE) and he uses Windows. That's why it took a loooong time to get even a simple version done.
+I knew in theory how you would implement such a hijack, but I learned it from [Guided Hacking](https://www.youtube.com/user/L4DL4D2EUROPE) and he uses Windows. That's why it took a loooong time to get even a simple version done.
 
 ```c
 #define _GNU_SOURCE
@@ -245,4 +245,4 @@ void hookJumping(Lightbug_CharacterControllerPro_Implementation_NormalMovement_o
 ```
 We are now really fast compared to before. And we can actually do double/tripple/quadruple.. jumps. It is almost like we could fly.
 And the race is also easily done.
-![](flag2.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/maze/maze_runner/flag2.png)

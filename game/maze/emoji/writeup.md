@@ -100,7 +100,7 @@ undefined8 ServerManager$$sendData(ServerManager_o *this,System_Byte_array *raw_
 }
 ```
 This is the function, that is supposed to be sending data to the Server.
-The structs were imported from the `il2cpp.h` file. I only had to retype the variables. The `this` pointer, was easy as this looks (by the naming convention) like a method and not like a normal function. The second argument had to be some sort of buffer. I first thought, that it would just be a raw `byte[]` but with that the algorithm would have made no sense. Then there is the `encrpted_out_buffer`, I knew the type from it because it is allocated at the begining of the function and I named it like this because it is the buffer actually being send to the server.
+The structs were imported from the `il2cpp.h` file. I only had to retype the variables. The `this` pointer, was easy as this looks (by the naming convention) like a method and not like a normal function. The second argument had to be some sort of buffer. I first thought, that it would just be a raw `byte[]` but with that the algorithm would have made no sense. Then there is the `encrpted_out_buffer`, I knew the type from it because it is allocated at the beginning of the function and I named it like this because it is the buffer actually being send to the server.
 
 But enough of why I have named things like they are. Let's have a look at the algorithm.
 It essentially starts at the beginning of the `else` block. First of all is the buffer `encrpted_out_buffer` allocated, it has a size of `len(raw_in_buffer) + 2`. Then we get the member `rand` from the `ServerManager` class. I had a bit of fear, that the server and the client would somehow exchange a seed to this random number generator and encrypt their packets with it. If they had done that would take a looot longer to code a proxy, so I just hoped for the best.
@@ -176,7 +176,7 @@ For now we just care about packets from the client to the server. If we just sta
 ```
 (If you already know a bit more about how the game works you can now hijack my account. Try it if you want)
 
-Based on the starting of the start of the packet `<3` (a hearth) I concluded that this is a hearthbeat.
+Based on the starting of the start of the packet `<3` (a hearth) I concluded that this is a heartbeat.
 
 If we move around a bit we send packet like that:
 ```
@@ -191,7 +191,7 @@ If we move around a bit we send packet like that:
 00000000: 3C 33 2A E3 73 7C 86 D1  F4 F6 BB 91 45 00 00 00  <3*.s|......E...
 00000010: 00 00
 ```
-This seems to be position packets (the `P` at the begining also matches that assumption)
+This seems to be position packets (the `P` at the beginning also matches that assumption)
 
 But these just spam our output at the moment so we can edit our parser, to ignore them for now.
 ```python
@@ -242,4 +242,4 @@ S 452AE3737C86D1F4F603
 ...
 ```
 And after a few tries we get to `S 452AE3737C86D1F4F60d` and the flag shows up:
-![](flag1.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/maze/emoji/flag1.png)

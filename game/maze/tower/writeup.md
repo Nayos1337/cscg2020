@@ -6,8 +6,8 @@ We are given a zip containing a game Executable and a few libraries and other as
 
 This is the third challenge I did in this series. If you don't understand why or when I did something, then you can try reading the writeups to the challenges before this one : `Maze - Emoji` and `Maze - Maze Runner`.
 
-I already had a "flyhack" programmed for the game from the last challenge. But to my disapointment we cannot use it to get over the walls of the maze. It seems like they extend infinitly into the air and if we try to cross one, the server teleports us back.
-If you try to bypass a check or something like this it is always a good idea to think about how one could have implemented this check and what flaws this implementation could have. In this case, I would probably check every packet send by the client, weather or not it is inside a wall and if this is the case I would teleport the client back to the last vaild position.  But simply trick this implementation, by just sending one packet right before the wall and one packet right after the wall. As we never send a packet inside the wall, the server will never notice, that we passed the wall.
+I already had a "flyhack" programmed for the game from the last challenge. But to my disappointment we cannot use it to get over the walls of the maze. It seems like they extend infinitely into the air and if we try to cross one, the server teleports us back.
+If you try to bypass a check or something like this it is always a good idea to think about how one could have implemented this check and what flaws this implementation could have. In this case, I would probably check every packet send by the client, weather or not it is inside a wall and if this is the case I would teleport the client back to the last valid position.  But simply trick this implementation, by just sending one packet right before the wall and one packet right after the wall. As we never send a packet inside the wall, the server will never notice, that we passed the wall.
 
 So I set myself the goal to implement this into the Proxy, because a implementation into the games code would be a lot more difficult.
 
@@ -27,7 +27,7 @@ And from the server to the client (teleport packet):
 ```
 
 Let's have a closer look at the first one.
-These a sequeltial packets, that means, there is not a big difference in position and rotaion between them.
+These a sequential packets, that means, there is not a big difference in position and rotation between them.
 ```
 00000000: 50 2A E3 73 7C 86 D1 F4  F6 CA 92 2D 00 00 00 00  P*.s|......-....
 00000010: 00 29 CC 10 00 D6 02 00  00 B0 CD 01 00 00 00 00  .)..............
@@ -58,17 +58,17 @@ After that we have got a 64bit little endian integer. It only increases an d at 
 
 After that there are three 4 bit signed integers. I know this because there a locations on the map where they flip from a low value to a high one (and because a reversed the game a bit more). These are the `x`, `y` and `z` coordinates of the player. All of those are scaled by `10000`.
 
-Next are 4 bit signed ints. These are euler angler, but only the second component is used.
+Next are 4 bit signed ints. These are Euler angler, but only the second component is used.
 
 The next byte are some kind of flags. (Player pressed jump, player is Landing again etc.)
 
 The last 4 bytes are 2 signed shorts with the horizontal and vertical speed.
 
-If we want to craft a vaild position packet we need to know a lot of things, but we can also copy a few things from the last send packet from the client.
+If we want to craft a valid position packet we need to know a lot of things, but we can also copy a few things from the last send packet from the client.
 * `time` we can take the last value + 1
 * `angle` just copy the last values
 * `flags` set to 0
-* `v/h speed` also set it to 0 (server tollerates that)
+* `v/h speed` also set it to 0 (server tolerates that)
 
 The packet from the server to the client is much easier:
 ```
@@ -144,7 +144,7 @@ while True:
     except Exception as e:
         print('injector :', e)
 ```
-You can now use the `T <x> <y> <z>` command and set the position of the player. But if it teleports you into a wall or too far away the server will port you back. But luckely it's enough to get trough a wall.
+You can now use the `T <x> <y> <z>` command and set the position of the player. But if it teleports you into a wall or too far away the server will port you back. But luckily it's enough to get trough a wall.
 
 Use one of:
 ```
@@ -153,10 +153,10 @@ T ~10 ~ ~
 T ~ ~ ~-10
 T ~ ~ ~10
 ```
- while standing right infront of a wall to go trough it.
- The command parses Mincraft command coordinates, which means that `~` is the current value and the number after it is an offset.
+ while standing right in front of a wall to go trough it.
+ The command parses Minecraft command coordinates, which means that `~` is the current value and the number after it is an offset.
 
  With this technique you can reach both the tower and the Lava chest.
 
-![](flag3.png)
-![](flag4.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/maze/tower/flag3.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/maze/tower/flag4.png)

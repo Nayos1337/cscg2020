@@ -19,16 +19,16 @@ So I jumped down the hole and just before I hit the ground I paused the game. My
 The second thing I did was to press ever key on my keyboard once and try to find hidden features, because there were no controls setting where I could look up  
 everything I can do. And I actually found something besides the usual WASD keys and the shift for sprint. F1 triggered my death without doing anything besides that and F2 would bring up some kind of debug screen.
 
-Obviously I was more interested in the F1 key. It could kill you if you are alive and could revive you if you were dead. So I jumped down the hole and tried to revive me after I died. It actually worked: the "Noob." deathscreen disappeared, but I had no control over my character anymore.
+Obviously I was more interested in the F1 key. It could kill you if you are alive and could revive you if you were dead. So I jumped down the hole and tried to revive me after I died. It actually worked: the "Noob." death screen disappeared, but I had no control over my character anymore.
 
 After that I had no idea anymore so I had to look into how the game works.
 ## Disassembling
 
-The loading screen of the game showed the Unity logo so I assumed it uses the Unity game engine. I also noticed the "MonoBleedingEdge" folder in the downloaded zip. So I quickly googled "Mono Unity" and found out, that Mono is similar to .NET (I'm new to Windows game hacking and Windows in general, so what I say might not be totally correct, but this is how I understand it). I knew of "dnSpy" a disassembler for the .NET Framework so I searched for an equivalent for Mono ... and found "ILSpy". It can decompile the Mono intermediate code into readable C#. From a [video](https://www.youtube.com/watch?v=r7tywn0QMqo) I even found out, how to modify the Code using a plugin called Reflexil.
+The loading screen of the game showed the Unity logo so I assumed it uses the Unity game engine. I also noticed the "MonoBleedingEdge" folder in the downloaded zip. So I quickly goggled "Mono Unity" and found out, that Mono is similar to .NET (I'm new to Windows game hacking and Windows in general, so what I say might not be totally correct, but this is how I understand it). I knew of "dnSpy" a disassembler for the .NET Framework so I searched for an equivalent for Mono ... and found "ILSpy". It can decompile the Mono intermediate code into readable C#. From a [video](https://www.youtube.com/watch?v=r7tywn0QMqo) I even found out, how to modify the Code using a plugin called Reflexil.
 
 ## Editing the code
 
-![](https://github.com/Nayos1337/cscg/raw/master/img1.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/ftwr/cave/img1.png)
 
 After looking through the classes in the "Assemby-CSharp.dll" Library a bit I found an interesting one : Player Controller.
 It contains a Method called "CheckFallDeath".
@@ -42,6 +42,6 @@ private void CheckFallDeath()
 	}
 }
 ```
-With the help of the Reflexil plugin I nopped out that function and jumped into the game again.
+With the help of the Reflexil plug-in I nopped out that function and jumped into the game again.
 
-![](https://github.com/Nayos1337/cscg/raw/master/img2.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/ftwr/cave/img2.png)

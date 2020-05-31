@@ -1,6 +1,6 @@
 # Xmas Shopping Site
 
-This was my favourite Web challenge in the CSCG 2020. Like the name suggests, it is a [XSS](https://en.wikipedia.org/wiki/Cross-site_scripting) challenge. We are given a link to a website `http://xss.allesctf.net/`. It is a very simple shop-like website. We can add items to our cart but there is no way to actually check out. But the Site has a few interesting links:
+This was my favorite Web challenge in the CSCG 2020. Like the name suggests, it is a [XSS](https://en.wikipedia.org/wiki/Cross-site_scripting) challenge. We are given a link to a website `http://xss.allesctf.net/`. It is a very simple shop-like website. We can add items to our cart but there is no way to actually check out. But the Site has a few interesting links:
 * Stage2 : There is a button called Stage2 which leads to the second stage. It says, that the admin has the flag stored on this site
 * Submit : here we can Submit a link for the admin to review. This is were the XSS can take affect  
 * Suche (Search) : The main page has a Search feature, with which you can search for products.
@@ -8,9 +8,11 @@ This was my favourite Web challenge in the CSCG 2020. Like the name suggests, it
 We have to find a XSS on the main page, because the `Stage2` page needs a token to be accessed, this token is contained in the link to `Stage2` on the main page. So the attack plan is to find some kind of XSS on the main page, which than has the token and can access `Stage2` where we have to find another XSS.
 ## XSS in Stage1
 The only real feature the main page has to offer is the search feature. If we search for something that is not found we get:
-![](search_error.png)
+
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/web/xmas_shopping_site/search_error.png)
+
 (`test` could not be found)
-The string we searched for is actutally passed as a get parameter `search`. And it seems to be echoed here. So we could try something like  `http://xss.allesctf.net/?search=<script>alert(1)</script>`. But this doesn't work. We do get the error but the script is not executed. I wanted to know what happened so I looked into the Dev-tools console. ```Refused to execute inline script because it violates the following Content Security Policy directive: "default-src 'self' http://*.xss.allesctf.net". ....```
+The string we searched for is actually passed as a get parameter `search`. And it seems to be echoed here. So we could try something like  `http://xss.allesctf.net/?search=<script>alert(1)</script>`. But this doesn't work. We do get the error but the script is not executed. I wanted to know what happened so I looked into the Dev-tools console. ```Refused to execute inline script because it violates the following Content Security Policy directive: "default-src 'self' http://*.xss.allesctf.net". ....```
 The bowser tells us here, that it refused to execute our payload because it violates the [CSP](https://en.wikipedia.org/wiki/Content_Security_Policy). The CSP is a way to prevent some XSS attacks. If the server sends the `Content-Security-Policy` with its response the bowser only allows some scripts to be executed based on the content of the header.
 In this case:
 `Content-Security-Policy: default-src 'self' http://*.xss.allesctf.net; object-src 'none'; base-uri 'none';`. I don't really understand this header, but the rest of the browser error message is helpful : `... Note also that 'script-src' was not explicitly set, so 'default-src' is used as a fallback.` As I understand this Note the browser is allowed to execute scripts if they have got a `src` tag, which matches the `default-src`. In our case this is `http://*.xss.allesctf.net`. The goal now is to find some sort of request that reflects our input on the website.
@@ -24,10 +26,11 @@ It seems like, that out parameter `cb` is reflected at the beginning of the resp
 (Requesting the `Stage2` page with fetch or something like that is blocked by [CORS](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing), because `stage2` has it's own subdomain)
 That means we have to also find a XSS on `Stage2`
 ## XSS on Stage2
-On the `Stage2` page the only real feature is the ability to change the background. And this is actutally done in a really weird way. On the top of the page there is a dropdown menu in which we can choose one of three backgrounds. If we do that the client first does a post request to the Server and then reloads the page.
-![](change_background_trace.png)
+On the `Stage2` page the only real feature is the ability to change the background. And this is actually done in a really weird way. On the top of the page there is a drop down menu in which we can choose one of three backgrounds. If we do that the client first does a post request to the Server and then reloads the page.
 
-This is weird because of the post request in the middle. The browser can handle this background change compleatly on its own without any interaction with the server. And if there is a rule for CTF challenges, than it is: `If something is done weird, it's intentional and it is important for exploitation`. So I looked into it a bit more. The script at `http://stage2.xss.allesctf.net/static/js/background.js` is responsible for the whole background changing thing:
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/web/xmas_shopping_site/change_background_trace.png)
+
+This is weird because of the post request in the middle. The browser can handle this background change completely on its own without any interaction with the server. And if there is a rule for CTF challenges, than it is: `If something is done weird, it's intentional and it is important for exploitation`. So I looked into it a bit more. The script at `http://stage2.xss.allesctf.net/static/js/background.js` is responsible for the whole background changing thing:
 ```js
 $(document).ready(() => {
     $("body").append(backgrounds[$("#bg").val()]);
@@ -47,7 +50,7 @@ const changeBackground = (e) => {
 
 };
 ```
-The first three lines in this script cause the loading of the background image. The `#bg` is a hidden input field, which is send by the server and it reflects the value of the last POST request. That means, if we change the background to `green` with the help of the POST request, than `$("#bg").val()` is the string `green`. This also works for strings which are not `green`, `red` or `tree`. We have basicly full constrol over `$("#bg").val()`, because we can do a POST request with the intended content. This even works from `Stage1`, because `CORS` only blocks us from doing a request where we can look at the result. But the result of this POST request is not import. The import thing is the change of the variable.
+The first three lines in this script cause the loading of the background image. The `#bg` is a hidden input field, which is send by the server and it reflects the value of the last POST request. That means, if we change the background to `green` with the help of the POST request, than `$("#bg").val()` is the string `green`. This also works for strings which are not `green`, `red` or `tree`. We have basically full control over `$("#bg").val()`, because we can do a POST request with the intended content. This even works from `Stage1`, because `CORS` only blocks us from doing a request where we can look at the result. But the result of this POST request is not import. The import thing is the change of the variable.
 
 The rest of the script is not that interesting. The next three lines change the click callback on the `.bg-btn`, which is the dropdown menu, to the `changeBackground` function and `changeBackground` does the weird POST request.  
 
@@ -55,7 +58,7 @@ After playing around a bit with the POST request, I found out, that we can actua
 ```html
 <input type="hidden" id="bg" value=""><h>test</h>">
 ```
-But like in `Stage1` we cannot use inline script tags to get JS execution. Here I was suck for a very long time (like two days or something like that). But eventually I looked at the `background` script again. The important part is the `$("body").append(...);` in the second line, because it can add a `script` tag add the end of `body` and it would actually be executed. (I don't know why this is I just tried it out). Our goal now is to somehow get the expression `backgrounds[$("#bg").val()]` to result in the source code for a script. At first glance this seems to be impossible, because the `backgrounds` array contains:
+But like in `Stage1` we cannot use in-line script tags to get JS execution. Here I was suck for a very long time (like two days or something like that). But eventually I looked at the `background` script again. The important part is the `$("body").append(...);` in the second line, because it can add a `script` tag add the end of `body` and it would actually be executed. (I don't know why this is I just tried it out). Our goal now is to somehow get the expression `backgrounds[$("#bg").val()]` to result in the source code for a script. At first glance this seems to be impossible, because the `backgrounds` array contains:
 ```js
 var backgrounds = {
     'red': [
@@ -69,7 +72,7 @@ var backgrounds = {
     ]
 }
 ```
-But after rewatching one of [Liveoverflows livestreams](https://www.youtube.com/watch?v=zjriIehgAec) I remembered a explotation methode called [DOM clobbering](https://portswigger.net/web-security/dom-based/dom-clobbering). In our case we want to clobber the JS variable `backgrounds`. To clobber something we have to make the definition invalid and then give an alternetive. In this specific case, we can invalidate the definition of by appending a open HTML comment at the end of our HTML injection because `backgrounds` is defined in a script right after the hidden input field. And an alternetive to the `backgrounds` js variable is also easy because we can include some HTML tag in our HTML injection with the id `backgrounds`. In JS this HTML tag will be used if we try to access the variable  `backgrounds` then. So our payload should look like this :
+But after rewatching one of [Liveoverflows livestreams](https://www.youtube.com/watch?v=zjriIehgAec) I remembered a exploitation method called [DOM clobbering](https://portswigger.net/web-security/dom-based/dom-clobbering). In our case we want to clobber the JS variable `backgrounds`. To clobber something we have to make the definition invalid and then give an alternative. In this specific case, we can invalidate the definition of by appending a open HTML comment at the end of our HTML injection because `backgrounds` is defined in a script right after the hidden input field. And an alternative to the `backgrounds` js variable is also easy because we can include some HTML tag in our HTML injection with the id `backgrounds`. In JS this HTML tag will be used if we try to access the variable  `backgrounds` then. So our payload should look like this :
 ```
 bg="><span id="backgrounds">test</span> <!--
 ```
@@ -113,7 +116,8 @@ The page around the hidden input looks like this after the request:
 </div>
 ```
 If we now try to access the `background` in the JS Console...
-![](console_clobbered_backgrounds.png)
+
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/web/xmas_shopping_site/console_clobbered_backgrounds.png)
 
 ... we sucessfully clobbered the variable. We now could no change `$("#bg").val()` to `innerText` this would mean, that `backgrounds[$("#bg").val()]` then is the `innerText` of our `span` tag (`test` in this case)
 
@@ -123,7 +127,7 @@ bg=innerText"><span id="backgrounds">%26lt%3Bscript%26gt%3Balert%281%29%26lt%3B%
 ```
 actually executes `alert(1)` because the `backgrounds` html tag has an innerText `<script>alert(1)</script>` and `$("#bg").val()` resolves to `innerText`
 
-## Putting it togeter
+## Putting it together
 The Plan:
 1. Use the XSS on `Stage1` to make the POST request to `Stage2` (without CORS)
 1. Redirect to `Stage2` where the payload in the post-request gets executed (this can make a non-cors request to a server of mine with the flag)

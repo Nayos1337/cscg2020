@@ -51,7 +51,7 @@ Modulus:
 Exponent: 65537 (0x10001)
 ```
 We can generate the needed private key if we can factor this modulus.
-[FactorDB](factordb.com) is a database with a lot of factorised numbers and sure enough our modulus was in there:
+[FactorDB](factordb.com) is a database with a lot of factorized numbers and sure enough our modulus was in there:
 ```
  	1032784903...79<617> = 622751 · 1658423516...29<611>
 ```

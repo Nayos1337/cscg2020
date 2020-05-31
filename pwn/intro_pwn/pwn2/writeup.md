@@ -1,5 +1,5 @@
 # Intro Pwn 2
-This challenge is very similar to the first pwn challenge in the cscg. It
+This challenge is very similar to the first pwn challenge in the CSCG. It
 only adds the following 2 functions. (Again, we are given the binary and
 its source)
 
@@ -37,7 +37,7 @@ void check_password_stage1() {
 ```
 
 `check_password_stage1` is called before every other function in the main method.
-It is a simple function, that checks whether or not we have already compleated the
+It is a simple function, that checks whether or not we have already completed the
 first challenge by letting us input the flag of the first challenge and comparing
 it against a constant. This seams secure, because it uses a custom function to
 read in the input instead of the exploitable function `gets`.
@@ -139,7 +139,7 @@ So the correct cookie is:
 ```
 
 We can now search our dumped values for the cookie. It is the 39th leak, this was
-the leaked return value from last time, so we have to ajust the code of our
+the leaked return value from last time, so we have to adjust the code of our
 script to account for that. The address we leaked last time is now the 41th leak,
 so we also need to change that. We also have to alter the offsets for the ret and
 the win addresses.
@@ -202,7 +202,7 @@ LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA
    0x55c130413d8c <AAAAAAAA+141>    leave  
    0x55c130413d8d <AAAAAAAA+142>    ret    
 ```
-We overwrote the cookie with `0x61616f6361616e63` (`cnaa`) so we can ajust the
+We overwrote the cookie with `0x61616f6361616e63` (`cnaa`) so we can adjust the
 script to place the cookie, the address of the return instruction and the address
 of win there.
 
@@ -219,8 +219,8 @@ p.interactive()
 ...
 ```
 
-But this works only locally agin. Which is again a sign for a not aligned stack
-and after adding a new ret to the cain, it can also exploit the server.
+But this works only locally again. Which is again a sign for a not aligned stack
+and after adding a new ret to the chain, it can also exploit the server.
 
 
 ```

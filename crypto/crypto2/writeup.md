@@ -30,9 +30,9 @@ Modulus:
 Exponent: 65537 (0x10001)
 ```
 But this time I was not that fortuned with [FactorDB](http://factordb.com/).
-The website had no factorisation of the questioned modulus. So I had to get creative.
+The website had no factorization of the questioned modulus. So I had to get creative.
 
-There is a basic attack on poorly generated RSA keys, if P and Q are very similar. `n = p * q` can be rewritten as `n = p * q = (s + x)(s - y)` where `s` is equal to the integer squareroot of `n`. If `p` and `q` are very similar than `x` and `y` are very small. So we can loop over all `x`s until we find one with which we can factor `n`. Theoretically this attack is possible on every RSA key, but will take more time the more `p` and `q` are apart from eachother.
+There is a basic attack on poorly generated RSA keys, if P and Q are very similar. `n = p * q` can be rewritten as `n = p * q = (s + x)(s - y)` where `s` is equal to the integer square root of `n`. If `p` and `q` are very similar than `x` and `y` are very small. So we can loop over all `x`s until we find one with which we can factor `n`. Theoretically this attack is possible on every RSA key, but will take more time the more `p` and `q` are apart from each other.
 
 
 So I wrote a python script to do exactly that :
@@ -41,7 +41,7 @@ from Crypto.Util.number import inverse
 
 n = 0x57c88f1c...1f8fefef
 
-# computes the integer squareroot of a number
+# computes the integer square root of a number
 # stolen from the primefac python module
 def isqrt(n):
     if n == 0:

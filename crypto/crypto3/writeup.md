@@ -69,7 +69,7 @@ AgED
 And sure enough each public exponent was 3. So I had to update my knowledge about that attack :
 [Wikipedia](https://en.wikipedia.org/wiki/RSA_(cryptosystem)#Attacks_against_plain_RSA) states:
 
-> If the same clear text message is sent to e or more recipients in an encrypted way, and the receivers share the same exponent e, but different p, q, and therefore n, then it is easy to decrypt the original clear text message via the Chinese remainder theorem. Johan Håstad noticed that this attack is possible even if the cleartexts are not equal, but the attacker knows a linear relation between them. This attack was later improved by Don Coppersmith.
+> If the same clear text message is sent to e or more recipients in an encrypted way, and the receivers share the same exponent e, but different p, q, and therefore n, then it is easy to decrypt the original clear text message via the Chinese remainder theorem. Johan Håstad noticed that this attack is possible even if the clear texts are not equal, but the attacker knows a linear relation between them. This attack was later improved by Don Coppersmith.
 
 Wikipedia mentions the [Chinese Remainder Theorem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem). It is an alogrithm to solve equations (for x) of the type:
 
@@ -92,7 +92,7 @@ m ^ e = m ^ 3 = c_3 mod n_3
 
 (c_x are the encrypted messages and n_x are the related public moduli)
 
-So if we would run the alogrithm on it we could determine `m ^ 3`. And if we would take the third root of that we would get the desired message `m`.
+So if we would run the algorithm on it we could determine `m ^ 3`. And if we would take the third root of that we would get the desired message `m`.
 
 ```python
 from functools import reduce
@@ -100,7 +100,7 @@ import gmpy
 
 
 # These 2 Functions were stolen from the rosettacode project which implements
-# a lot of useful alogrithms in a lot of different programming languages
+# a lot of useful algorithms in a lot of different programming languages
 # https://rosettacode.org/wiki/Chinese_remainder_theorem#Python
 def chinese_remainder(n, a):
     sum = 0

@@ -15,7 +15,7 @@ puts("Thats not the password!"Thats not the password!
 )                                                                                                          = 24
 +++ exited (status 0) +++
 ```
-The problem with that is, that we always inputted the same char, but got different results and at first glance I thought, that the encoded password was just the alphabet from some letter, but this is not the case. So I opened [Ghidra](https://ghidra-sre.org/). After the basic anlaysis it decompiles main to:
+The problem with that is, that we always inputted the same char, but got different results and at first glance I thought, that the encoded password was just the alphabet from some letter, but this is not the case. So I opened [Ghidra](https://ghidra-sre.org/). After the basic analysis it decompiles main to:
 ```c
 undefined8 main(void)
 

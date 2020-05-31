@@ -2,7 +2,7 @@
 
 For this stego challange we are given only an image: `chall.png`
 After running a few different tools on the file I was sucessful with `stegsolve`
-![](chall_stegsolve.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/steg/intro_steg/steg3/chall_stegsolve.png)
 
 It is a bit hard to read, but it says: `The password is s33_m3_1f_y0u_c4n`
 A few tool later I found something with `binwalk`:
@@ -43,4 +43,4 @@ Compressed: 220
 $ cat flag.txt
 CSCG{H1dden_1n_pla1n_s1ght}
 ```
-As the password I used the found string `s33_m3_1f_y0u_c4n`. 
+As the password I used the found string `s33_m3_1f_y0u_c4n`.

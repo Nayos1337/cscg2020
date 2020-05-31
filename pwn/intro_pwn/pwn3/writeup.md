@@ -10,19 +10,19 @@ void WINgardium_leviosa() {
     // system("/bin/sh") it's not that easy anymore.
 }
 ```
-It doesn't call `system` anymore and this might seem like a minor change, but is actually a lot more difficult now. Because the source code is almost the same like last time we can use the same stragtegy to gain rip controll, but what do we do then. We cannot just call that one function, that will give us a shell. Of cause we could call `system` with the `/bin/sh` string, but for this to work we need to get the randomized address of `system`, becaue there is no plt entry for it (The code never uses the system function so the compiler didn't include a `system@plt`). If we want to call `system`, then we have to call the system function inside libc and we have to pass the `/bin/sh` string to it. And we can solve both of these problems in one go.
+It doesn't call `system` anymore and this might seem like a minor change, but is actually a lot more difficult now. Because the source code is almost the same like last time we can use the same strategy to gain rip control, but what do we do then. We cannot just call that one function, that will give us a shell. Of cause we could call `system` with the `/bin/sh` string, but for this to work we need to get the randomized address of `system`, because there is no plt entry for it (The code never uses the system function so the compiler didn't include a `system@plt`). If we want to call `system`, then we have to call the system function inside libc and we have to pass the `/bin/sh` string to it. And we can solve both of these problems in one go.
 
 Let's say we have got the address of `printf` in the libc binary, then we could calculate the offset of it to `system`, but this only works if we have got the exact libc, that is used on the server and that's where the Dockerfile comes in.
 We can pull up our own Docker image and check the libc used and I just hoped that it would work.
 
-That's the plan, but this plan would only work if we got the actual address of some libc function in the binaray, but how can we do this?
+That's the plan, but this plan would only work if we got the actual address of some libc function in the binary, but how can we do this?
 
 We have got a format string vulnerability in our binary, but we already "used" it to get a return pointer to defeat the random addresses for the main binary.
 But as we have got rip control we can just call the `welcome` function, which introduces the bug, again.
 
 But what do we do with a format expoit? We want to get the address of `printf` in the binary.
 
-And here the `plt` comes in. The format string `%s` is used to print a string, but we can use it to read abetrary memory. The fact, that the buffer, that is used in the `printf` is stored makes that possible.    
+And here the `plt` comes in. The format string `%s` is used to print a string, but we can use it to read arbitrary memory. The fact, that the buffer, that is used in the `printf` is stored makes that possible.    
 
 ## The Plan
 
@@ -33,7 +33,7 @@ And here the `plt` comes in. The format string `%s` is used to print a string, b
 * The result will be the data at `printf@got.plt`, which is the address of `printf` in libc.
 * We then calculate the addresses of `system` and `/bin/sh` in the libc binary (yes the libc binary has the string `/bin/sh` in it)
 * We use the `AAAAAAAA` function again to get rip control with a ropchain looking like this `<pop rdi><addr of binsh><addr of system>`
-(The string argument of system is strored in rdi and every c binary has a `pop rdi` rop gadget)
+(The string argument of system is stored in rdi and every c binary has a `pop rdi` rop gadget)
 
 
 ## The Script

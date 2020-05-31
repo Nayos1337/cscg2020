@@ -1,6 +1,6 @@
 # Intro Reversing 2
 
-This challenge is a bit more tricky, than the last one. Now `strings` is not the way to go, so there is no hardcoded password in the binary. But the code has to still comapre the right password against ours. A useful tool, that we can use in this case is `ltrace` it traces all libc library calls:
+This challenge is a bit more tricky, than the last one. Now `strings` is not the way to go, so there is no hard coded password in the binary. But the code has to still compare the right password against ours. A useful tool, that we can use in this case is `ltrace` it traces all libc library calls:
 ```bash
 $ ltrace ./rev2
 fopen("./flag", "r")                                                                                                                     = 0x55e3e15c82a0
@@ -15,14 +15,14 @@ puts("Thats not the password!"Thats not the password!
 )                                                                                                          = 24
 +++ exited (status 0) +++
 ```
-The call that is interesting here is the `strcmp` call. We comapre two strings witheach other. If we run the binary again (with another password), than we recognise, that the first string is somekind of encoding of the inputted password and the second one is constant. Our goal now is to somehow reverse that encoding, to get from the constant string to the right password.
+The call that is interesting here is the `strcmp` call. We compare two strings with each other. If we run the binary again (with another password), than we recognize, that the first string is some kind of encoding of the inputted password and the second one is constant. Our goal now is to somehow reverse that encoding, to get from the constant string to the right password.
 ```
 AAAAAAAAAAA...... maps to  \312\312\312\312\312\312\312\312\312\312\312...
 ABCDEFGHIJK...... maps to  \312\313\314\315\316\317\320\321\322\323\324...
 ```
 It seems so, that an `A (0x41)` always maps to `\312 (0xCA)`, a `B (0x42)` maps to `\313 (0xCB)`...
-There is always a differnce of `137 (0x89)`.
-So if we want to encode a string we simply have to add `0x89` to every char. But there is a problem with that : What happens if this addition overflows a byte? Do we carry or do we just drop that?  But luckly we can test that : `z (0x7a)` would map to `259 (0x103)`. If we run our binary we get :
+There is always a difference of `137 (0x89)`.
+So if we want to encode a string we simply have to add `0x89` to every char. But there is a problem with that : What happens if this addition overflows a byte? Do we carry or do we just drop that?  But luckily we can test that : `z (0x7a)` would map to `259 (0x103)`. If we run our binary we get :
 ```
 zzzzzzz : \003\003\003\003\003\003\003
 ```

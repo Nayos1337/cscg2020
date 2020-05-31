@@ -132,6 +132,6 @@ def parse(data, port, origin, state):
 ```
 The resulting image looks like this
 
-![](image.png)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/game/maze/map_radar/image.png)
 
 FLAG : `CSCG{RADAR_HACK_XYZ}`

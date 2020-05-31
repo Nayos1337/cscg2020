@@ -41,12 +41,12 @@ int main(void) {
 }
 ```
 `gadget_shop` is never called and is only there for (like the name says) [ROP](https://en.wikipedia.org/wiki/Return-oriented_programming)-gadgets.
-`ropnop` is an interesting function. It makes the whole text section read-write-executable and loops over every byte in the text section, and replaces all `0xc3` bytes with `0x90`. This has the effect, that every return optcode is replaced by an nop optcode. I assume that, that should prevent ROP attacks. But it also clobbers the normal function of ret instructions, which seems very stupid to do. Also the text section is still writeable after it is called.
+`ropnop` is an interesting function. It makes the whole text section read-write-executable and loops over every byte in the text section, and replaces all `0xc3` bytes with `0x90`. This has the effect, that every return optcode is replaced by an nop optcode. I assume that, that should prevent ROP attacks. But it also clobbers the normal function of ret instructions, which seems very stupid to do. Also the text section is still writable after it is called.
 `main` calls `ropnop`, which is supposed to prevent ROP and then lets us overwrite the stack.
 
 I was also a bit confused about the ropnop function, because it replaces all ret optcodes, which means if the `ropnop` is done and tries to return, this optcode is a nop which makes the function not return and execute the bytes after it in the binary.
 
-But this assumtion is wrong, because the code used to overwrite the code, overwrites itself. This is a bit confusing, but I will explain it.
+But this assumption is wrong, because the code used to overwrite the code, overwrites itself. This is a bit confusing, but I will explain it.
 
 Before the start of the program, the ropnop function looks like this:
 
@@ -143,7 +143,7 @@ The difference is, that the cmp instruction, that compares the current byte with
 > cmp    ecx,0x90
 ```
 
-So essentialy everything after this compare is not modified, because `0x90` will be replaced with `0x90`
+So essentially everything after this compare is not modified, because `0x90` will be replaced with `0x90`
 
 But before we care about that we first have to get our ropchain working. The [pwntools](https://pypi.org/project/pwntools/) tool cyclic is very useful in this case.
 
@@ -186,7 +186,7 @@ LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA
 ───────────────────────────────────────────[ DISASM ]───────────────────────────────────────────
  ► 0x55dc480c12e1 <main+65>    ret    <0x6161616861616167>
 ```
-`rsp` points to an address containing `0x6161616861616167 (gaaahaaa)`. The program now tries to return to this address, but because there is no vaild memory at `0x6161616861616167` we get a segfault.
+`rsp` points to an address containing `0x6161616861616167 (gaaahaaa)`. The program now tries to return to this address, but because there is no valid memory at `0x6161616861616167` we get a segfault.
 
 With the `cyclic_find` function we can calculate the offset to our input:
 ```python
@@ -195,7 +195,7 @@ p.sendline(b"A" * cyclic_find(b'gaaa') + b"XXXX")
 
 ...
 ```
-We now control the instruction pointer, but the ropgadgets created by `gadget_shop` were invalidated. So we need to find other gadgets. The program kindly prints the start address of the text section, so we only need the offset in the text section to get a vaild address.  [ROPgadget](https://github.com/JonathanSalwan/ROPgadget) is a cool tool to do exactly that.
+We now control the instruction pointer, but the ropgadgets created by `gadget_shop` were invalidated. So we need to find other gadgets. The program kindly prints the start address of the text section, so we only need the offset in the text section to get a valid address.  [ROPgadget](https://github.com/JonathanSalwan/ROPgadget) is a cool tool to do exactly that.
 It has a command line option (`--range start-end`), with which you can set where it should start searching for gadgets. We know that we can only use gadgets after the end of the `ropnop` function.
 
 ```
@@ -237,7 +237,7 @@ Gadgets information
 
 Unique gadgets found: 24
 ```
-That are not that many ropgadgets and I was stuck here for a long time, until I revistited the code and remembered, that the `ropnop` function marked the hole text section writeable. So we somehow need to write our code somewere and then jump to that address. The last step is easy: we only need to append that address to our ropchain. But the first part is a bit tricky, but we can use the libc function `read` to do that. And we are lucky because the main function calles `read` right before we get rip control. That means, that a lot of setup for the function is already done and we only need to alter a few values. In fact we only need to change the `buf` argument, which is stored in the `rsi` register. And to our luck we have got a pop-rsi gadgets in the reachable ones :
+That are not that many ropgadgets and I was stuck here for a long time, until I revisited the code and remembered, that the `ropnop` function marked the hole text section writeable. So we somehow need to write our code somewhere and then jump to that address. The last step is easy: we only need to append that address to our ropchain. But the first part is a bit tricky, but we can use the libc function `read` to do that. And we are lucky because the main function calls `read` right before we get rip control. That means, that a lot of setup for the function is already done and we only need to alter a few values. In fact we only need to change the `buf` argument, which is stored in the `rsi` register. And to our luck we have got a pop-rsi gadgets in the reachable ones :
 ```
 0x0000000000001351 : pop rsi ; pop r15 ; ret
 ```
@@ -297,4 +297,4 @@ $
 $ echo "/9j/4AAQSk...R/rj/2Q==" > meme.base64
 $ cat meme.base64 | base64 -d > meme.jpg
 ```
-![](meme.jpg)
+![](https://raw.githubusercontent.com/Nayos1337/cscg2020/master/pwn/ropnop/meme.jpg)

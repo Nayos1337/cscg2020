@@ -7,7 +7,7 @@ Give me your password:
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Thats not the password!
 ```
-We are requested to input a password, but as we don't know this password, we have to somehow figure out what it is. The easies implementation for such a password check would be to just compare it to the right password stored somewhere in the binary. `strings` is a utility that searches a binary for strings, so we can use this to find a potentialy stored password.
+We are requested to input a password, but as we don't know this password, we have to somehow figure out what it is. The easies implementation for such a password check would be to just compare it to the right password stored somewhere in the binary. `strings` is a utility that searches a binary for strings, so we can use this to find a potentially stored password.
 ```bash
 $ strings rev1
 ...
